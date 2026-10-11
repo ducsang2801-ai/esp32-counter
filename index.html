@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ESP32 Touch Counter</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 320px;
+            max-width: 80vw;
+            box-shadow: 0 10px 30px #0005;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        #counter {
+            font-size: 90px;
+            color: #38bdf8;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        #status {
+            color: #22c55e;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>ESP32 Touch Counter</h1>
+
+        <p>Total Touch Count</p>
+
+        <div id="counter">--</div>
+
+        <p id="status">Connecting...</p>
+    </div>
+
+    <script>
+        const firebaseURL =
+          "https://esp-32-counting-default-rtdb.asia-southeast1.firebasedatabase.app/counter.json";
+
+        async function updateCounter() {
+            try {
+                const response = await fetch(
+                    firebaseURL + "?t=" + Date.now(),
+                    { cache: "no-store" }
+                );
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const count = await response.json();
+
+                document.getElementById("counter")
+                    .textContent = count ?? 0;
+
+                document.getElementById("status")
+                    .textContent = "● Connected";
+
+            } catch (error) {
+                document.getElementById("status")
+                    .textContent = "● Connection Error";
+
+                console.error(error);
+            }
+        }
+
+        updateCounter();
+
+        setInterval(updateCounter, 1000);
+    </script>
+</body>
+</html>
